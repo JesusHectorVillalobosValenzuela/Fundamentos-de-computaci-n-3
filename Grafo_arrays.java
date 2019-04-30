@@ -8,7 +8,9 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.Map;
+import java.util.Queue;
 import java.util.Scanner;
 import java.util.Stack;
 
@@ -66,17 +68,64 @@ public class Grafo_arrays {
     }
 
     public static void main(String[] args) throws IOException {
-        // TODO code application logic here
+        
 
-        String origen = "jesus", destino = "alberto", cadena, path;
+        String origen = "jesus", destino = "karen", cadena, path;
         path = "/Users/villalobos28/OneDrive - Universidad de Sonora/Fuandamentos 3/grafo_con_arreglos.txt";
         Grafo g = CargaArchivos("/Users/villalobos28/OneDrive - Universidad de Sonora/Fuandamentos 3/lista.txt");
         //g.DespliegaGrafo();
 
         //cadena = EscribeGrafo(g);
         //graba_grafo(path,cadena);
-        DFS(g, origen, destino);
+        //DFS(g, origen, destino);
+        BFS(g, origen, destino);
 
+    }
+    
+    public static void BFS (Grafo grafo, String origen, String destino){
+        boolean encontrado = false;
+        Queue <Vertice> queue = new LinkedList <>();
+        Vertice v = grafo.Vertices.get(origen);
+        queue.add(v);
+        do {
+            v = queue.remove();
+            if (v.nombre.equals(destino)) {
+                encontrado = true;
+                break;
+            } else {
+                v.visitado = true;
+                add_adjacent(grafo,queue,v);
+            }            
+            System.out.println("Vert: " + v.nombre);
+            despliega_queue(queue);
+            
+        } while (queue.isEmpty() == false && encontrado == false);
+        if (encontrado == true) {
+            System.out.println("Si se encontro un camino entre " + origen + " y " + destino);
+        } else {
+            System.out.println("No se encontro un camino entre " + origen + " y " + destino);
+        }
+        
+    }
+    
+    public static void add_adjacent(Grafo grafo, Queue<Vertice> queue, Vertice v){
+        int row = v.indice , col = 0;
+        for (Map.Entry<String, Vertice> vertice : grafo.Vertices.entrySet()) {
+            col = vertice.getValue().indice;
+            if (grafo.Conexiones[row][col] > 0) {
+                if (vertice.getValue().visitado == false) {
+                    queue.add(vertice.getValue());
+                }
+            }
+        }
+    }
+    
+    public static void despliega_queue(Queue<Vertice> queue){
+        System.out.println("Queue: ");
+        for (Vertice vertice : queue) {
+            System.out.print(vertice.nombre + " ");
+        }
+        System.out.println("\n");
     }
 
     public static void DFS(Grafo grafo, String origen, String destino) {
@@ -93,7 +142,7 @@ public class Grafo_arrays {
                 break;
             } else {
                 v.visitado = true;
-                pushAd(grafo, stack, v);
+                push_adjacent(grafo, stack, v);
             }
             System.out.println("Vert: " + v.nombre);
             despliega_stack(stack);
@@ -106,10 +155,9 @@ public class Grafo_arrays {
         }
     }
 
-    public static void pushAd(Grafo grafo, Stack<Vertice> stack, Vertice v) {
+    public static void push_adjacent(Grafo grafo, Stack<Vertice> stack, Vertice v) {
         int row = 0, col = 0;
         row = v.indice;
-
         for (Map.Entry<String, Vertice> vertice : grafo.Vertices.entrySet()) {
             col = vertice.getValue().indice;
             if (grafo.Conexiones[row][col] > 0) {
@@ -124,7 +172,7 @@ public class Grafo_arrays {
         for (int i = 0; i < stack.size(); i++) {
             System.out.println("Stack: " + stack.get(i).nombre);
         }
-        System.out.println("");
+        System.out.println();
     }
 
     public static Grafo CargaArchivos(String archivo) {
